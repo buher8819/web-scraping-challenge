@@ -11,7 +11,7 @@ def scrape():
     all_data = {}
     output = marsnews()
     all_data["mars_news"] = output[0]
-    all_data["mars_paragraph"] = output[1]
+    all_data["mars_p"] = output[1]
     all_data["mars_image"] = marsimage()
     all_data["mars_weather"] = marsweather()
     all_data["mars_facts"] = marsfacts()
@@ -39,8 +39,12 @@ def marsimage():
     return featured_image_url
 
 def marsweather():
-    
-
+    twitter_url = "https://twitter.com/marswxreport?lang=en"
+    browser.visit(twitter_url)
+    html = browser.html
+    soup = bs(html, "html.parser")
+    tweet = soup.find("div", attrs = {"class":"tweet", "data-name":"Mars Weather"})
+    mars_weather = tweet.find("p", "tweet-text").text()
     return mars_weather
 
 def marsfacts():
@@ -64,7 +68,7 @@ def marshemisphere():
 
     for hemi in hemispheres:
         title = hemi.find("h3").text
-        title = title.replace("Enhanced", "")
+        title = title.replace("Enhanced", "") #enhanced is not included in the example
         end_link = hemi.find("a")["href"]
         image_link = "https://astrogeology.usgs.gov/" + end_link    
         browser.visit(image_link)
